@@ -34,7 +34,7 @@ namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
             // add new coords to Obstacles..
             _matchRepository.Obstacles =
                 gameState.players
-                    .Select(p => p.coordinates.LastOrDefault())
+                    .SelectMany(p => p.coordinates.AsSpan().Slice(_matchRepository.lastIteration).ToArray())
                     .Aggregate(_matchRepository.Obstacles,
                         (state, coords) => coords is null ? state : state.Add(new Coords(coords.x, coords.y)));
             
@@ -81,6 +81,7 @@ namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
         {
             public string CurrentPlayerName { get; init; }
             public ImmutableHashSet<Coords> Obstacles { get; set; } = ImmutableHashSet<Coords>.Empty;
+            public int lastIteration { get; set; } = 0;
             public Direction Bias { get; set; }
         }
     }

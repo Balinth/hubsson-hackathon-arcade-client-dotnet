@@ -25,18 +25,22 @@ public record PlanAheadNode
         };
         
         nodes.Enqueue(rootNode, 0);
+        PriorityQueue<PlanAheadNode, float> allNodes = new PriorityQueue<PlanAheadNode, float>();
         
-        while (cancellationToken.IsCancellationRequested is false)
+
+        while (cancellationToken.IsCancellationRequested is false && nodes.TryDequeue(out var currentNode, out var _))
         {
-            var currentNode = nodes.Dequeue();
             var newNodes = currentNode.ExpandPlan(width, height);
+            
             foreach (var newNode in newNodes)
             {
-                nodes.Enqueue(newNode, newNode.CalcFreedomHeuristicScore(width, height));
+                var priority = newNode.CalcFreedomHeuristicScore(width, height);
+                nodes.Enqueue(newNode, priority);
+                allNodes.Enqueue(newNode, priority);
             }
         }
 
-        var nextStep = nodes.Dequeue().GetFirstMove();
+        var nextStep = allNodes.Dequeue().GetFirstMove();
 
         Console.WriteLine($"Iterations planned ahead: {nextStep.CalcIteration()}");
 
