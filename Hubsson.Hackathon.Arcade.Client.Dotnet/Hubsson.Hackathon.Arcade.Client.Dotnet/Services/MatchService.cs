@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using Hubsson.Hackathon.Arcade.Client.Dotnet.Domain;
+using Action = Hubsson.Hackathon.Arcade.Client.Dotnet.Domain.Action;
 using ClientGameState = Hubsson.Hackathon.Arcade.Client.Dotnet.Domain.ClientGameState;
 
 namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
@@ -10,26 +13,37 @@ namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
         
         public MatchService(ArcadeSettings settings)
         {
-            _matchRepository = new MatchRepository();
+            _matchRepository = new MatchRepository()
+            {
+                CurrentPlayerName = settings.TeamId,
+                Bias = Direction.Up
+            };
             _arcadeSettings = settings;
         }
         
         public void Init()
         {
             // On Game Init
-            throw new NotImplementedException();
         }
 
-        public Hubsson.Hackathon.Arcade.Client.Dotnet.Domain.Action Update(ClientGameState gameState)
+        public Action Update(ClientGameState gameState)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             // On Each Frame Update return an Action for your player
+            var newDir = PathFind.DumbAvoider(gameState.players, _matchRepository.CurrentPlayerName, gameState.width,
+                gameState.height, _matchRepository.Bias);
 
-            throw new NotImplementedException();
+            _matchRepository.Bias = newDir;
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed);
+            return new Action() { iteration = gameState.iteration, direction = newDir};
         }
 
-        private class MatchRepository
+        public class MatchRepository
         {
-            // Write your data fields here what you would like to store between the match rounds
+            public string CurrentPlayerName { get; init; }
+            public Direction Bias { get; set; }
         }
     }
 }
