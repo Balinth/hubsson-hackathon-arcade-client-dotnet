@@ -7,7 +7,7 @@ on:
 
 env:
   AZURE_CONTAINER_REGISTRY: HubssonHackathon  
-  AZURE_WEBAPP_NAME: NumberOneHardProblem     # Update with your Azure Web App name
+  AZURE_WEBAPP_NAME: lowercaserepositoryname     # Update with your Azure Web App name
 
 jobs:
     build-and-deploy-client:
